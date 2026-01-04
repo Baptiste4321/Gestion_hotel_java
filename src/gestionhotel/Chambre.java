@@ -1,0 +1,60 @@
+package gestionhotel;
+
+public abstract class Chambre {
+    protected int numero;
+    protected double prixParNuit;
+    protected boolean occupee;
+    protected int capacite;
+
+    public Chambre(int numero, double prixParNuit, int capacite) {
+        this.numero = numero;
+        this.prixParNuit = prixParNuit;
+        this.capacite = capacite;
+        this.occupee = false;
+    }
+
+    public int getNumero() {
+        return numero;
+    }
+
+    public void setNumero(int numero) {
+        this.numero = numero;
+    }
+
+    public double getPrixParNuit() {
+        return prixParNuit;
+    }
+
+    public void setPrixParNuit(double prixParNuit) {
+        this.prixParNuit = prixParNuit;
+    }
+
+    public boolean isOccupee() {
+        return occupee;
+    }
+
+    public void setOccupee(boolean occupee) {
+        this.occupee = occupee;
+    }
+
+    public int getCapacite() {
+        return capacite;
+    }
+
+    public void setCapacite(int capacite) {
+        this.capacite = capacite;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("Chambre %d - %s - Capacité: %d - Prix/nuit: %.2f€ - %s",
+                numero, getType(), capacite, prixParNuit, (occupee ? "Occupée" : "Disponible"));
+    }
+
+    public abstract String getType();
+
+    public double calculerPrix(int nbNuits) {
+        return prixParNuit * nbNuits;
+    }
+}
+
