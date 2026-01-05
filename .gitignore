@@ -23,4 +23,5 @@
 hs_err_pid*
 replay_pid*
 
-../hotel_data.csv
+# CSV files
+*.csv
