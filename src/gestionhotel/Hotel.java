@@ -501,6 +501,17 @@ public class Hotel {
             writer.println("Durée          : " + r.calculerNombreNuits() + " nuit(s)");
             writer.println("-----------------------------------------");
 
+            // Détail des réductions sur la facture
+            if (r.estEnBasseSaison()) {
+                writer.println("Réduction Basse Saison   : -20%");
+            }
+            if (r.calculerNombreNuits() > 7) {
+                writer.println("Réduction Long Séjour    : -10%");
+            }
+            if (r.getClient().isVip()) {
+                writer.println("Réduction Client VIP     : -5%");
+            }
+
             // Détails financiers
             writer.println("CONSOMMATION :");
             writer.printf("Hébergement              : %8.2f€\n", r.calculerPrixChambre());

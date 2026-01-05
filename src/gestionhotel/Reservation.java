@@ -5,6 +5,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.time.Month;
 
 public class Reservation {
     private static final AtomicInteger COUNTER = new AtomicInteger(1);
@@ -103,13 +104,27 @@ public class Reservation {
 
     public double calculerPrixTotal() {
         double total = calculerPrixChambre() + calculerPrixServices();
+
+        if (estEnBasseSaison()) {
+            total = total * 0.80; // Applique 20% de réduction
+        }
         if (calculerNombreNuits() > 7) {
-            total = total * 0.90;
+            total = total * 0.90; // Réduction long séjour
         }
         if (client.isVip()) {
-            total = total * 0.95; // 5% de réduction supplémentaire
+            total = total * 0.95; // Réduction VIP
         }
         return total;
+    }
+    public boolean estEnBasseSaison() {
+        try {
+            LocalDate debut = LocalDate.parse(dateDebut, FORMAT);
+            Month mois = debut.getMonth();
+            // On décide que Janvier, Février et Novembre sont en promo mais c'est juste comme ca
+            return mois == Month.JANUARY || mois == Month.FEBRUARY || mois == Month.NOVEMBER;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     public void ajouterService(Service s) {
@@ -131,6 +146,9 @@ public class Reservation {
         StringBuilder sb = new StringBuilder();
         sb.append(String.format("Réservation #%d - Client: %s - Chambre: %s\n", numeroReservation, client.getNomComplet(), (chambre == null ? "-" : String.valueOf(chambre.getNumero()))));
         sb.append(String.format("Période: %s -> %s (%d nuits) - Statut: %s\n", dateDebut, dateFin, calculerNombreNuits(), statut));
+        if (estEnBasseSaison()) {
+            sb.append(">>> PROMOTION BASSE SAISON APPLIQUÉE (-20%) <<<\n");
+        }
         double prixCh = calculerPrixChambre();
         double prixSv = calculerPrixServices();
         double prixTot = calculerPrixTotal();
