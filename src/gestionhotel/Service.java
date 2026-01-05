@@ -37,7 +37,7 @@ public class Service {
 
     @Override
     public String toString() {
-        return String.format("%s - %.2f euros - %s", nom, prix, description == null ? "" : description);
+        return String.format("%s - %.2f %s - %s", nom, prix, (prix <= 1 ? "euro" : "euros"), description == null ? "" : description);
     }
 }
 

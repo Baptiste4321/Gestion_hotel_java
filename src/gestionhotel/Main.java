@@ -317,7 +317,8 @@ public class Main {
             if (s == null) System.out.println("Index invalide.");
             else { r.ajouterService(s); System.out.println("Service ajouté."); }
         }
-        System.out.println("Total services: " + r.calculerPrixServices() + "€");
+        double totalServices = r.calculerPrixServices();
+        System.out.println("Total services: " + totalServices + (totalServices <= 1 ? " euro" : " euros"));
     }
 
     private static void menuServices() {
@@ -365,7 +366,10 @@ public class Main {
             System.out.print("Choix: ");
             int c = readInt();
             switch (c) {
-                case 1: System.out.printf("CA: %.2f€\n", hotel.calculerChiffreAffaires()); break;
+                case 1: 
+                    double ca = hotel.calculerChiffreAffaires();
+                    System.out.printf("CA: %.2f %s\n", ca, (ca <= 1 ? "euro" : "euros")); 
+                    break;
                 case 2: System.out.printf("Taux: %.2f%%\n", hotel.calculerTauxOccupation()); break;
                 case 3:
                     Chambre ch = hotel.getChambrePlusReservee();

@@ -115,7 +115,10 @@ public class Hotel {
             System.out.println("Aucun client enregistré.");
             return;
         }
-        for (Client cl : clients) System.out.println(cl);
+        for (Client cl : clients) {
+            int nbReservations = compterReservationsClient(cl);
+            System.out.println(cl + " - Réservations: " + nbReservations + (cl.isVip() ? " [VIP]" : ""));
+        }
     }
 
     public Client rechercherClient(int numero) {
@@ -164,7 +167,25 @@ public class Hotel {
         }
         Reservation r = new Reservation(c, ch, debut, fin);
         reservations.add(r);
+        
+        // Vérifier si le client atteint 10 réservations pour devenir VIP
+        if (!c.isVip() && compterReservationsClient(c) >= 10) {
+            c.setVip(true);
+            System.out.println("Félicitations " + c.getNomComplet() + " ! Vous êtes maintenant client VIP !");
+        }
+        
         return r;
+    }
+
+    public int compterReservationsClient(Client c) {
+        if (c == null) return 0;
+        int count = 0;
+        for (Reservation r : reservations) {
+            if (r.getClient().getNumeroClient() == c.getNumeroClient()) {
+                count++;
+            }
+        }
+        return count;
     }
 
     public void afficherToutesLesReservations() {
@@ -214,7 +235,8 @@ public class Hotel {
     }
 
     public void afficherStatistiques() {
-        System.out.printf("Chiffre d'affaires: %.2f€\n", calculerChiffreAffaires());
+        double ca = calculerChiffreAffaires();
+        System.out.printf("Chiffre d'affaires: %.2f %s\n", ca, (ca <= 1 ? "euro" : "euros"));
         System.out.printf("Taux d'occupation: %.2f%%\n", calculerTauxOccupation());
         Chambre top = getChambrePlusReservee();
         if (top != null) System.out.println("Chambre la plus réservée: " + top.getNumero() + " (" + top.getType() + ")");

@@ -47,8 +47,8 @@ public abstract class Chambre {
 
     @Override
     public String toString() {
-        return String.format("Chambre %d - %s - Capacité: %d - Prix/nuit: %.2f€ - %s",
-                numero, getType(), capacite, prixParNuit, (occupee ? "Occupée" : "Disponible"));
+        return String.format("Chambre %d - %s - Capacité: %d - Prix/nuit: %.2f %s - %s",
+                numero, getType(), capacite, prixParNuit, (prixParNuit <= 1 ? "euro" : "euros"), (occupee ? "Occupée" : "Disponible"));
     }
 
     public abstract String getType();
