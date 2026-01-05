@@ -5,6 +5,7 @@ import java.util.Scanner;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.LocalDate;
+import java.io.File;
 
 public class Main {
     private static final Scanner scanner = new Scanner(System.in);
@@ -12,7 +13,13 @@ public class Main {
 
     public static void main(String[] args) {
         hotel = new Hotel("Hôtel Java", "1 Rue du Code");
-        seedData();
+
+        File f = new File("hotel_data.csv");
+        if (f.exists()) {
+            hotel.chargerDonnees();
+        } else {
+            seedData();
+        }
         mainMenu();
     }
 
@@ -31,7 +38,7 @@ public class Main {
         hotel.ajouterServiceDisponible(new Service("Parking", 10.0, "Par jour"));
         hotel.ajouterServiceDisponible(new Service("Wifi Premium", 5.0, "Par jour"));
 
-        // Clients (exemples)
+        // Clients (test)
         hotel.ajouterClient(new Client("Dupont", "Jean", "jean.dupont@example.com", "0600000001"));
         hotel.ajouterClient(new Client("Martin", "Alice", "alice.martin@example.com", "0600000002"));
     }
@@ -54,7 +61,8 @@ public class Main {
                 case 4: menuServices(); break;
                 case 5: menuStats(); break;
                 case 0:
-                    System.out.println("Au revoir.");
+                    hotel.sauvegarderDonnees();
+                    System.out.println("Données sauvegardées. Au revoir.");
                     return;
                 default: System.out.println("Choix invalide.");
             }

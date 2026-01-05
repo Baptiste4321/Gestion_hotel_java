@@ -5,6 +5,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.io.*;
 
 public class Hotel {
     private String nom;
@@ -203,5 +204,135 @@ public class Hotel {
         if (counts.isEmpty()) return null;
         int bestNum = counts.entrySet().stream().max(Comparator.comparingInt(Map.Entry::getValue)).get().getKey();
         return rechercherChambre(bestNum);
+    }
+    public void sauvegarderDonnees() {
+        try (PrintWriter writer = new PrintWriter(new FileWriter("hotel_data.csv"))) {
+            // save clients
+            writer.println("---CLIENTS---");
+            for (Client c : clients) {
+                writer.printf("%d;%s;%s;%s;%s\n", c.getNumeroClient(), c.getNom(), c.getPrenom(), c.getEmail(), c.getTelephone());
+            }
+
+            // save chambres
+            writer.println("---CHAMBRES---");
+            for (Chambre c : chambres) {
+                String type = "SIMPLE";
+                String extra = "";
+                if (c instanceof ChambreDouble) {
+                    type = "DOUBLE";
+                    extra = String.valueOf(((ChambreDouble) c).isLitsJumeaux());
+                } else if (c instanceof Suite) {
+                    type = "SUITE";
+                    extra = ((Suite) c).hasJacuzzi() + ";" + ((Suite) c).hasBalcon();
+                }
+
+                writer.printf("%s;%d;%.2f;%b;%s\n", type, c.getNumero(), c.getPrixParNuit(), c.isOccupee(), extra);
+            }
+
+            // save reservations
+            writer.println("---RESERVATIONS---");
+            for (Reservation r : reservations) {
+
+                writer.printf("%d;%d;%d;%s;%s;%s\n",
+                        r.getNumeroReservation(),
+                        r.getClient().getNumeroClient(),
+                        r.getChambre().getNumero(),
+                        r.getDateDebut(),
+                        r.getDateFin(),
+                        r.getStatut());
+            }
+
+            System.out.println("Données sauvegardées dans hotel_data.csv !");
+        } catch (IOException e) {
+            System.out.println("Erreur sauvegarde : " + e.getMessage());
+        }
+    }
+
+    public void chargerDonnees() {
+        File fichier = new File("hotel_data.csv");
+        if (!fichier.exists()) return;
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(fichier))) {
+            String ligne;
+            String section = "";
+            int maxIdClient = 0;
+
+            clients.clear();
+            chambres.clear();
+            reservations.clear();
+
+            while ((ligne = reader.readLine()) != null) {
+                if (ligne.startsWith("---")) {
+                    section = ligne;
+                    continue;
+                }
+
+                String[] parts = ligne.split(";");
+
+                // charge clients
+                if (section.equals("---CLIENTS---") && parts.length >= 5) {
+                    Client c = new Client(parts[1], parts[2], parts[3], parts[4]);
+
+                    try {
+                        int idLuu = Integer.parseInt(parts[0]);
+                        if (idLuu > maxIdClient) maxIdClient = idLuu;
+                    } catch(NumberFormatException e) { /* ignoré */ }
+                    clients.add(c);
+                }
+                // charge chambres
+                else if (section.equals("---CHAMBRES---") && parts.length >= 4) {
+                    String type = parts[0];
+                    int num = Integer.parseInt(parts[1]);
+                    boolean occupee = Boolean.parseBoolean(parts[3]);
+
+                    if (type.equals("SIMPLE")) {
+                        ChambreSimple c = new ChambreSimple(num);
+                        c.setOccupee(occupee);
+                        chambres.add(c);
+                    } else if (type.equals("DOUBLE") && parts.length >= 5) {
+                        boolean litsJumeaux = Boolean.parseBoolean(parts[4]);
+                        ChambreDouble c = new ChambreDouble(num, litsJumeaux);
+                        c.setOccupee(occupee);
+                        chambres.add(c);
+                    } else if (type.equals("SUITE") && parts.length >= 6) {
+                        boolean jacuzzi = Boolean.parseBoolean(parts[4]);
+                        boolean balcon = Boolean.parseBoolean(parts[5]);
+                        Suite c = new Suite(num, jacuzzi, balcon);
+                        c.setOccupee(occupee);
+                        chambres.add(c);
+                    }
+                }
+                // charge reservations
+                else if (section.equals("---RESERVATIONS---") && parts.length >= 6) {
+                    int idClient = Integer.parseInt(parts[1]);
+                    int numChambre = Integer.parseInt(parts[2]);
+
+                    Client cl = null;
+                    for(Client c : clients) {
+                        if(clients.indexOf(c) + 1 == idClient) { cl = c; break; }
+                    }
+
+                    if(cl == null && !clients.isEmpty() && idClient <= clients.size()) {
+                        cl = clients.get(idClient - 1);
+                    }
+
+                    Chambre ch = rechercherChambre(numChambre);
+
+                    if (cl != null && ch != null) {
+                        Reservation r = new Reservation(cl, ch, parts[3], parts[4]);
+                        r.setStatut(parts[5]);
+                        reservations.add(r);
+                    }
+                }
+            }
+
+            if (maxIdClient > 0) {
+                Client.setCompteur(maxIdClient + 1);
+            }
+
+            System.out.println("Données chargées avec succès !");
+        } catch (Exception e) {
+            System.out.println("Erreur chargement : " + e.getMessage());
+        }
     }
 }
