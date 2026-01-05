@@ -311,10 +311,15 @@ public class Hotel {
     }
     public void sauvegarderDonnees() {
         String fichier = getNomFichier();
-        try (PrintWriter writer = new PrintWriter(new FileWriter(fichier))) {            // save clients
+        try (PrintWriter writer = new PrintWriter(new FileWriter(fichier))) {
+            // save hotel info
+            writer.println("---HOTEL---");
+            writer.printf("%s;%s\n", nom, adresse);
+            
+            // save clients
             writer.println("---CLIENTS---");
             for (Client c : clients) {
-                writer.printf("%d;%s;%s;%s;%s\n", c.getNumeroClient(), c.getNom(), c.getPrenom(), c.getEmail(), c.getTelephone());
+                writer.printf("%d;%s;%s;%s;%s;%b\n", c.getNumeroClient(), c.getNom(), c.getPrenom(), c.getEmail(), c.getTelephone(), c.isVip());
             }
 
             // save chambres
@@ -386,9 +391,17 @@ public class Hotel {
 
                 String[] parts = ligne.split(";");
 
+                // charge hotel info
+                if (section.equals("---HOTEL---") && parts.length >= 2) {
+                    this.nom = parts[0];
+                    this.adresse = parts[1];
+                }
                 // charge clients
-                if (section.equals("---CLIENTS---") && parts.length >= 5) {
+                else if (section.equals("---CLIENTS---") && parts.length >= 5) {
                     Client c = new Client(parts[1], parts[2], parts[3], parts[4]);
+                    if (parts.length >= 6) {
+                        c.setVip(Boolean.parseBoolean(parts[5]));
+                    }
 
                     try {
                         int idLuu = Integer.parseInt(parts[0]);
@@ -481,14 +494,15 @@ public class Hotel {
             return;
         }
 
-        // Nom du fichier unique basé sur le numéro de réservation
-        String nomFichier = "facture_" + r.getNumeroReservation() + ".txt";
+        // Nom du fichier unique basé sur le nom de l'hôtel et le numéro de réservation
+        String nomFichierFacture = "facture_" + nom.replaceAll("[^a-zA-Z0-9]", "_") + "_" + r.getNumeroReservation() + ".txt";
 
-        try (PrintWriter writer = new PrintWriter(new FileWriter(nomFichier))) {
-            // En-tête de l'hôtel
+        try (PrintWriter writer = new PrintWriter(new FileWriter(nomFichierFacture))) {
+            // En-tête de l'hôtel (utilise le nom et l'adresse de l'hôtel actuel)
             writer.println("=========================================");
-            writer.println("           HÔTEL JAVA FACTURE            ");
-            writer.println("          1 Rue du Code, Paris           ");
+            writer.println("           " + nom.toUpperCase() + "           ");
+            writer.println("          " + adresse + "           ");
+            writer.println("              FACTURE                    ");
             writer.println("=========================================");
             writer.println();
 
@@ -536,11 +550,81 @@ public class Hotel {
             writer.printf("TOTAL À PAYER            : %8.2f€\n", r.calculerPrixTotal());
             writer.println("=========================================");
             writer.println("      Merci de votre visite !            ");
+            writer.println("         " + nom + "                     ");
 
-            System.out.println("Facture générée avec succès : " + nomFichier);
+            System.out.println("Facture générée avec succès : " + nomFichierFacture);
 
         } catch (IOException e) {
             System.out.println("Erreur lors de la création de la facture : " + e.getMessage());
         }
+    }
+
+    // ===== GESTION MULTI-HOTELS =====
+    
+    private static final String FICHIER_HOTELS = "hotels_liste.csv";
+    
+    /**
+     * Sauvegarde la liste de tous les hôtels dans un fichier central
+     */
+    public static void sauvegarderListeHotels(ArrayList<Hotel> hotels) {
+        try (PrintWriter writer = new PrintWriter(new FileWriter(FICHIER_HOTELS))) {
+            for (Hotel h : hotels) {
+                writer.printf("%s;%s;%s\n", h.getNom(), h.getAdresse(), h.getNomFichier());
+            }
+            System.out.println("Liste des hôtels sauvegardée !");
+        } catch (IOException e) {
+            System.out.println("Erreur sauvegarde liste hôtels : " + e.getMessage());
+        }
+    }
+    
+    /**
+     * Charge la liste de tous les hôtels depuis le fichier central
+     */
+    public static ArrayList<Hotel> chargerListeHotels() {
+        ArrayList<Hotel> hotels = new ArrayList<>();
+        File fichier = new File(FICHIER_HOTELS);
+        
+        if (!fichier.exists()) {
+            return hotels;
+        }
+        
+        try (BufferedReader reader = new BufferedReader(new FileReader(fichier))) {
+            String ligne;
+            while ((ligne = reader.readLine()) != null) {
+                String[] parts = ligne.split(";");
+                if (parts.length >= 2) {
+                    Hotel h = new Hotel(parts[0], parts[1]);
+                    h.chargerDonnees();
+                    hotels.add(h);
+                }
+            }
+            System.out.println(hotels.size() + " hôtel(s) chargé(s) !");
+        } catch (IOException e) {
+            System.out.println("Erreur chargement liste hôtels : " + e.getMessage());
+        }
+        
+        return hotels;
+    }
+    
+    /**
+     * Sauvegarde tous les hôtels (leurs données + la liste)
+     */
+    public static void sauvegarderTousLesHotels(ArrayList<Hotel> hotels) {
+        for (Hotel h : hotels) {
+            h.sauvegarderDonnees();
+        }
+        sauvegarderListeHotels(hotels);
+    }
+    
+    public String getAdresse() {
+        return adresse;
+    }
+    
+    public void setNom(String nom) {
+        this.nom = nom;
+    }
+    
+    public void setAdresse(String adresse) {
+        this.adresse = adresse;
     }
 }

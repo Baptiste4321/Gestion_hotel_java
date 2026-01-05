@@ -16,10 +16,14 @@ public class Main {
     private static Hotel currentHotel;
 
     public static void main(String[] args) {
-        // Au démarrage, on initialise le système
-        // (Dans une version encore plus poussée, on pourrait scanner le dossier pour charger les fichiers .csv existants)
+        // Au démarrage, on charge la liste des hôtels existants
+        chaineHotels = Hotel.chargerListeHotels();
+        
         if (chaineHotels.isEmpty()) {
             System.out.println("Bienvenue dans le système de gestion Multi-Hôtels.");
+            System.out.println("Aucun hôtel trouvé. Créez-en un pour commencer.");
+        } else {
+            System.out.println("Bienvenue ! " + chaineHotels.size() + " hôtel(s) chargé(s).");
         }
 
         // Lancement du menu de sélection de l'hôtel
@@ -32,6 +36,7 @@ public class Main {
             System.out.println("\n=== GESTION CHAÎNE HÔTELIÈRE ===");
             System.out.println("1) Sélectionner un hôtel existant");
             System.out.println("2) Créer un nouvel hôtel");
+            System.out.println("3) Sauvegarder tous les hôtels");
             System.out.println("0) Quitter le programme");
             System.out.print("Choix: ");
 
@@ -43,8 +48,13 @@ public class Main {
                 case 2:
                     creerNouvelHotel();
                     break;
+                case 3:
+                    Hotel.sauvegarderTousLesHotels(chaineHotels);
+                    System.out.println("Tous les hôtels ont été sauvegardés !");
+                    break;
                 case 0:
-                    System.out.println("Fermeture du programme. Au revoir !");
+                    Hotel.sauvegarderTousLesHotels(chaineHotels);
+                    System.out.println("Données sauvegardées. Au revoir !");
                     return;
                 default:
                     System.out.println("Choix invalide.");
@@ -66,6 +76,7 @@ public class Main {
         }
 
         chaineHotels.add(h);
+        Hotel.sauvegarderListeHotels(chaineHotels);
         System.out.println("Hôtel '" + nom + "' créé avec succès !");
     }
 
