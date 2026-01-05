@@ -264,7 +264,17 @@ public class Main {
                 case 7:
                     System.out.print("Numéro réservation à terminer: ");
                     int nt = readInt(); hotel.terminerReservation(nt); System.out.println("Opération effectuée."); break;
-                case 8: return;
+                case 8:
+                    System.out.print("Numéro réservation pour facture : ");
+                    int numFact = readInt();
+                    Reservation rFact = hotel.rechercherReservation(numFact);
+                    if (rFact != null) {
+                        hotel.genererFacture(rFact);
+                    } else {
+                        System.out.println("Réservation non trouvée.");
+                    }
+                    break;
+                case 9: return;
                 default: System.out.println("Choix invalide.");
             }
         }

@@ -220,7 +220,14 @@ public class Hotel {
 
     public void terminerReservation(int numero) {
         Reservation r = rechercherReservation(numero);
-        if (r != null) r.terminer();
+        if (r != null) {
+            r.terminer();
+            System.out.println("Réservation terminée.");
+
+            genererFacture(r);
+        } else {
+            System.out.println("Réservation introuvable.");
+        }
     }
 
     // Statistiques
