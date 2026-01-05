@@ -128,7 +128,7 @@ public class Reservation {
         StringBuilder sb = new StringBuilder();
         sb.append(String.format("Réservation #%d - Client: %s - Chambre: %s\n", numeroReservation, client.getNomComplet(), (chambre == null ? "-" : String.valueOf(chambre.getNumero()))));
         sb.append(String.format("Période: %s -> %s (%d nuits) - Statut: %s\n", dateDebut, dateFin, calculerNombreNuits(), statut));
-        sb.append(String.format("Prix chambre: %.2f€ - Prix services: %.2f€ - Total: %.2f€\n", calculerPrixChambre(), calculerPrixServices(), calculerPrixTotal()));
+        sb.append(String.format("Prix chambre: %.2f euros - Prix services: %.2f euros - Total: %.2f euros\n", calculerPrixChambre(), calculerPrixServices(), calculerPrixTotal()));
         if (!services.isEmpty()) {
             sb.append("Services:\n");
             for (Service s : services) sb.append(" - ").append(s.toString()).append("\n");

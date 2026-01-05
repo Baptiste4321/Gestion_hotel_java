@@ -187,9 +187,23 @@ public class Main {
                     System.out.print("Nouveau nom (vide = inchangé): ");
                     String nm = readLine(); if (!nm.isEmpty()) cmod.setNom(nm);
                     System.out.print("Nouvel email (vide = inchangé): ");
-                    String em = readLine(); if (!em.isEmpty()) cmod.setEmail(em);
+                    String em = readLine();
+                    if (!em.isEmpty()) {
+                        while (!em.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
+                            System.out.print("Email invalide. Veuillez entrer un email valide (ex: exemple@mail.com): ");
+                            em = readLine();
+                        }
+                        cmod.setEmail(em);
+                    }
                     System.out.print("Nouveau téléphone (vide = inchangé): ");
-                    String tel = readLine(); if (!tel.isEmpty()) cmod.setTelephone(tel);
+                    String tel = readLine();
+                    if (!tel.isEmpty()) {
+                        while (!tel.matches("\\d{10}")) {
+                            System.out.print("Numéro invalide. Veuillez entrer exactement 10 chiffres: ");
+                            tel = readLine();
+                        }
+                        cmod.setTelephone(tel);
+                    }
                     System.out.println("Client mis à jour: " + cmod);
                     break;
                 case 5: return;
@@ -204,11 +218,10 @@ public class Main {
         System.out.print("Nom: ");
         String nom = readLine();
         System.out.print("Email: ");
-        String email = readLine();
-        System.out.print("Téléphone: ");
-        String tel = readLine();
+        String email = lireEmailValide();
+        System.out.print("Téléphone : ");
+        String tel = lireTelephoneValide();
         Client c = new Client(nom, prenom, email, tel);
-        if (!c.validerEmail()) System.out.println("Attention: email non valide.");
         hotel.ajouterClient(c);
         System.out.println("Client ajouté: " + c);
     }
@@ -396,6 +409,26 @@ public class Main {
     }
     private static String readLine() {
         return scanner.nextLine().trim();
+    }
+
+    private static String lireTelephoneValide() {
+        while (true) {
+            String tel = readLine();
+            if (tel.matches("\\d{10}")) {
+                return tel;
+            }
+            System.out.print("Numéro invalide. Veuillez entrer exactement 10 chiffres: ");
+        }
+    }
+
+    private static String lireEmailValide() {
+        while (true) {
+            String email = readLine();
+            if (email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
+                return email;
+            }
+            System.out.print("Email invalide. Veuillez entrer un email valide (ex: exemple@mail.com): ");
+        }
     }
 
 
