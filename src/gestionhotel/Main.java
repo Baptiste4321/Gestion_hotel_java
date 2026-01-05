@@ -108,7 +108,7 @@ public class Main {
                     break;
                 case 7:
                     System.out.println("--- Recherche avancée ---");
-                    System.out.print("Type souhaité (ou vide) : ");
+                    System.out.print("Type souhaité (Simple/Double/Suite ou vide) : ");
                     String type = readLine();
                     System.out.print("Budget maximum : ");
                     double maxPrix = readDouble();
