@@ -12,6 +12,12 @@ import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.io.IOException;
 
+public String getNom() {
+    return nom;
+}
+private String getNomFichier() {
+    return "hotel_" + nom.replaceAll("[^a-zA-Z0-9.-]", "_") + ".csv";
+}
 public class Hotel {
     private String nom;
     private String adresse;
@@ -302,8 +308,8 @@ public class Hotel {
         return rechercherChambre(bestNum);
     }
     public void sauvegarderDonnees() {
-        try (PrintWriter writer = new PrintWriter(new FileWriter("hotel_data.csv"))) {
-            // save clients
+        String fichier = getNomFichier();
+        try (PrintWriter writer = new PrintWriter(new FileWriter(fichier))) {            // save clients
             writer.println("---CLIENTS---");
             for (Client c : clients) {
                 writer.printf("%d;%s;%s;%s;%s\n", c.getNumeroClient(), c.getNom(), c.getPrenom(), c.getEmail(), c.getTelephone());
@@ -358,7 +364,7 @@ public class Hotel {
     }
 
     public void chargerDonnees() {
-        File fichier = new File("hotel_data.csv");
+        File fichier = new File(getNomFichier());
         if (!fichier.exists()) return;
 
         try (BufferedReader reader = new BufferedReader(new FileReader(fichier))) {
