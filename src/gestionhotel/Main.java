@@ -238,7 +238,8 @@ public class Main {
             System.out.println("5) Ajouter des services à une réservation");
             System.out.println("6) Annuler une réservation");
             System.out.println("7) Terminer une réservation");
-            System.out.println("8) Retour");
+            System.out.println("8) Générer une facture pour une réservation");
+            System.out.println("9) Retour");
             System.out.print("Choix: ");
             int c = readInt();
             switch (c) {
