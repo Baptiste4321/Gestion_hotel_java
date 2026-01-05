@@ -105,7 +105,21 @@ public class Main {
                     if (lp.isEmpty()) System.out.println("Aucune chambre sous ce prix.");
                     else lp.forEach(System.out::println);
                     break;
-                case 7: return;
+                case 7:
+                    System.out.println("--- Recherche avancée ---");
+                    System.out.print("Type souhaité (ou vide) : ");
+                    String type = readLine();
+                    System.out.print("Budget maximum : ");
+                    double maxPrix = readDouble();
+
+                    var resultats = hotel.rechercherChambresMultiCriteres(type, maxPrix);
+                    if (resultats.isEmpty()) {
+                        System.out.println("Aucune chambre ne correspond à vos critères.");
+                    } else {
+                        resultats.forEach(System.out::println);
+                    }
+                    break;
+                case 8: return;
                 default: System.out.println("Choix invalide.");
             }
         }

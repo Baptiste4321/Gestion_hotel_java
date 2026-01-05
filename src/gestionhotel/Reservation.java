@@ -131,5 +131,12 @@ public class Reservation {
         }
         return sb.toString();
     }
+    public double calculerPrixTotal() {
+        double total = calculerPrixChambre() + calculerPrixServices();
+        if (calculerNombreNuits() > 7) {
+            total = total * 0.90;
+        }
+        return total;
+    }
 }
 

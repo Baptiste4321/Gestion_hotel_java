@@ -228,6 +228,11 @@ public class Hotel {
 
                 writer.printf("%s;%d;%.2f;%b;%s\n", type, c.getNumero(), c.getPrixParNuit(), c.isOccupee(), extra);
             }
+            // save services catalog
+            writer.println("---SERVICES_CATALOG---");
+            for (Service s : servicesDisponibles) {
+                writer.printf("%s;%.2f;%s\n", s.getNom(), s.getPrix(), s.getDescription());
+            }
 
             // save reservations
             writer.println("---RESERVATIONS---");
@@ -240,6 +245,14 @@ public class Hotel {
                         r.getDateDebut(),
                         r.getDateFin(),
                         r.getStatut());
+            }
+            //save services des réservations
+            writer.println("---RESERVATION_SERVICES---");
+            for (Reservation r : reservations) {
+                for (Service s : r.getServices()) {
+                    // Format: ID_Reservation;Nom_Service;Prix;Description
+                    writer.printf("%d;%s;%.2f;%s\n", r.getNumeroReservation(), s.getNom(), s.getPrix(), s.getDescription());
+                }
             }
 
             System.out.println("Données sauvegardées dans hotel_data.csv !");
@@ -302,6 +315,16 @@ public class Hotel {
                         chambres.add(c);
                     }
                 }
+                // charge services catalog
+                else if (section.equals("---SERVICES_CATALOG---") && parts.length >= 3) {
+                    try {
+                        String nom = parts[0];
+                        double prix = Double.parseDouble(parts[1]);
+                        String desc = parts[2];
+                        servicesDisponibles.add(new Service(nom, prix, desc));
+                    } catch (Exception e) { /* Ignorer ligne corrompue */ }
+                }
+
                 // charge reservations
                 else if (section.equals("---RESERVATIONS---") && parts.length >= 6) {
                     int idClient = Integer.parseInt(parts[1]);
@@ -323,6 +346,19 @@ public class Hotel {
                         r.setStatut(parts[5]);
                         reservations.add(r);
                     }
+                }
+
+                // charge services des réservations
+                else if (section.equals("---RESERVATION_SERVICES---") && parts.length >= 4) {
+                    try {
+                        int idRes = Integer.parseInt(parts[0]);
+                        Reservation r = rechercherReservation(idRes);
+                        if (r != null) {
+                            // On recrée l'objet service pour la réservation
+                            Service s = new Service(parts[1], Double.parseDouble(parts[2]), parts[3]);
+                            r.ajouterService(s);
+                        }
+                    } catch (Exception e) { /* Ignorer */ }
                 }
             }
 
