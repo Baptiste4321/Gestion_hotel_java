@@ -70,5 +70,9 @@ public class Client {
     public String toString() {
         return String.format("Client #%d - %s - Email: %s - Tel: %s", numeroClient, getNomComplet(), email, telephone);
     }
+
+    public static void setCompteur(int valeur) {
+        COUNTER.set(valeur);
+    }
 }
 

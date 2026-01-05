@@ -2,6 +2,9 @@ package gestionhotel;
 
 import java.util.InputMismatchException;
 import java.util.Scanner;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.time.LocalDate;
 
 public class Main {
     private static final Scanner scanner = new Scanner(System.in);
@@ -251,9 +254,9 @@ public class Main {
             if (ch.isOccupee()) { System.out.println("Chambre déjà occupée."); return; }
 
             System.out.print("Date début (jj/mm/aaaa): ");
-            String debut = readLine();
+            String debut = lireDateValide("Date début");
             System.out.print("Date fin (jj/mm/aaaa): ");
-            String fin = readLine();
+            String fin = lireDateValide("Date fin");
 
             Reservation r = hotel.creerReservation(client, ch, debut, fin);
             if (r == null) System.out.println("Impossible de créer la réservation.");
@@ -370,7 +373,20 @@ public class Main {
         }
     }
 
-    private static String readLine() {
-        return scanner.nextLine().trim();
+    private static String lireDateValide(String message) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/M/yyyy");
+        while (true) {
+            System.out.print(message + " (jj/mm/aaaa) : ");
+            String dateStr = readLine();
+            try {
+                LocalDate date = LocalDate.parse(dateStr, formatter);
+                if (date.isBefore(LocalDate.now())) {
+                    System.out.println("Erreur : La date ne peut pas être dans le passé.");
+                    continue;
+                }
+                return dateStr;
+            } catch (DateTimeParseException e) {
+                System.out.println("Format invalide. Merci d'utiliser le format jour/mois/année (ex: 25/12/2024).");
+            }
+        }
     }
-}

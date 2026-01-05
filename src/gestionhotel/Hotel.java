@@ -22,10 +22,23 @@ public class Hotel {
         this.reservations = new ArrayList<>();
         this.servicesDisponibles = new ArrayList<>();
     }
+    public ArrayList<Chambre> rechercherChambresMultiCriteres(String type, double prixMax) {
+        String t = type == null ? "" : type.toLowerCase();
+        return chambres.stream()
+                .filter(c -> c.getType().toLowerCase().contains(t))
+                .filter(c -> c.getPrixParNuit() <= prixMax)
+                .filter(c -> !c.isOccupee())
+                .collect(Collectors.toCollection(ArrayList::new));
+    }
 
     // Gestion des chambres
     public void ajouterChambre(Chambre c) {
-        if (c != null) chambres.add(c);
+        if (c == null) return;
+        if (rechercherChambre(c.getNumero()) != null) {
+            System.out.println("Une chambre avec ce numéro existe déjà: " + c.getNumero());
+            return;
+        }
+        chambres.add(c);
     }
 
     public void afficherToutesLesChambres() {
@@ -63,7 +76,12 @@ public class Hotel {
 
     // Gestion des clients
     public void ajouterClient(Client c) {
-        if (c != null) clients.add(c);
+        if (c == null) return;
+        if (c.getEmail() != null && rechercherClientParEmail(c.getEmail()) != null) {
+            System.out.println("Un client avec cet email existe déjà: " + c.getEmail());
+            return;
+        }
+        clients.add(c);
     }
 
     public void afficherTousLesClients() {
