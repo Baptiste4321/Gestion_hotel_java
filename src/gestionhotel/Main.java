@@ -394,6 +394,10 @@ public class Main {
             System.out.print("Entrée invalide (true/false), réessayez: ");
         }
     }
+    private static String readLine() {
+        return scanner.nextLine().trim();
+    }
+
 
     private static String lireDateValide(String message) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/M/yyyy");
@@ -412,3 +416,4 @@ public class Main {
             }
         }
     }
+}
