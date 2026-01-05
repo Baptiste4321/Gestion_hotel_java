@@ -166,19 +166,22 @@ public class Main {
             System.out.println("2) Afficher tous les clients");
             System.out.println("3) Rechercher un client");
             System.out.println("4) Modifier un client");
-            System.out.println("5) Retour");
+            System.out.println("5) Historique des réservations d'un client");
+            System.out.println("6) Retour");
             System.out.print("Choix: ");
             int c = readInt();
             switch (c) {
                 case 1: ajouterClientInteractive(); break;
                 case 2: hotel.afficherTousLesClients(); break;
                 case 3:
+                    hotel.afficherTousLesClients();
                     System.out.print("Numéro client: ");
                     int num = readInt();
                     Client cl = hotel.rechercherClient(num);
                     System.out.println(cl == null ? "Client non trouvé." : cl);
                     break;
                 case 4:
+                    hotel.afficherTousLesClients();
                     System.out.print("Numéro client à modifier: ");
                     int id = readInt();
                     Client cmod = hotel.rechercherClient(id);
@@ -207,7 +210,19 @@ public class Main {
                     }
                     System.out.println("Client mis à jour: " + cmod);
                     break;
-                case 5: return;
+                case 5:
+                    hotel.afficherTousLesClients();
+                    System.out.print("Numéro client: ");
+                    int idHist = readInt();
+                    Client clHist = hotel.rechercherClient(idHist);
+                    if (clHist == null) { 
+                        System.out.println("Client non trouvé."); 
+                    } else {
+                        System.out.println("\n--- Historique des réservations de " + clHist.getNomComplet() + " ---");
+                        hotel.afficherReservationsClient(clHist);
+                    }
+                    break;
+                case 6: return;
                 default: System.out.println("Choix invalide.");
             }
         }
@@ -238,20 +253,23 @@ public class Main {
             System.out.println("5) Ajouter des services à une réservation");
             System.out.println("6) Annuler une réservation");
             System.out.println("7) Terminer une réservation");
-            System.out.println("8) Générer une facture pour une réservation");
-            System.out.println("9) Retour");
+            System.out.println("8) Supprimer une réservation");
+            System.out.println("9) Générer une facture pour une réservation");
+            System.out.println("10) Retour");
             System.out.print("Choix: ");
             int c = readInt();
             switch (c) {
                 case 1: creerReservationInteractive(); break;
                 case 2: hotel.afficherToutesLesReservations(); break;
                 case 3:
+                    hotel.afficherTousLesClients();
                     System.out.print("Numéro client: ");
                     int id = readInt();
                     Client cl = hotel.rechercherClient(id);
                     hotel.afficherReservationsClient(cl);
                     break;
                 case 4:
+                    hotel.afficherToutesLesReservations();
                     System.out.print("Numéro réservation: ");
                     int num = readInt();
                     Reservation r = hotel.rechercherReservation(num);
@@ -260,12 +278,21 @@ public class Main {
                 case 5:
                     ajouterServicesReservationInteractive(); break;
                 case 6:
+                    hotel.afficherToutesLesReservations();
                     System.out.print("Numéro réservation à annuler: ");
                     int na = readInt(); hotel.annulerReservation(na); System.out.println("Opération effectuée."); break;
                 case 7:
+                    hotel.afficherToutesLesReservations();
                     System.out.print("Numéro réservation à terminer: ");
                     int nt = readInt(); hotel.terminerReservation(nt); System.out.println("Opération effectuée."); break;
                 case 8:
+                    hotel.afficherToutesLesReservations();
+                    System.out.print("Numéro réservation à supprimer: ");
+                    int nSuppr = readInt();
+                    hotel.supprimerReservation(nSuppr);
+                    break;
+                case 9:
+                    hotel.afficherToutesLesReservations();
                     System.out.print("Numéro réservation pour facture : ");
                     int numFact = readInt();
                     Reservation rFact = hotel.rechercherReservation(numFact);
@@ -275,7 +302,7 @@ public class Main {
                         System.out.println("Réservation non trouvée.");
                     }
                     break;
-                case 9: return;
+                case 10: return;
                 default: System.out.println("Choix invalide.");
             }
         }
@@ -283,7 +310,25 @@ public class Main {
 
     private static void creerReservationInteractive() {
         try {
-            System.out.print("Numéro client existant (0 = nouveau client): ");
+            // 1. D'abord demander les dates
+            String debut = lireDateValide("Date début");
+            String fin = lireDateValide("Date fin");
+
+            // 2. Afficher les chambres disponibles pour ces dates
+            var chambresDisponibles = hotel.getChambresDisponibles(debut, fin);
+            if (chambresDisponibles.isEmpty()) {
+                System.out.println("Aucune chambre disponible pour ces dates.");
+                return;
+            }
+            System.out.println("\nChambres disponibles du " + debut + " au " + fin + " :");
+            for (Chambre c : chambresDisponibles) {
+                double prix = c.getPrixParNuit();
+                System.out.println(String.format("Chambre %d - %s - Capacité: %d - Prix/nuit: %.2f %s",
+                    c.getNumero(), c.getType(), c.getCapacite(), prix, (prix <= 1 ? "euro" : "euros")));
+            }
+
+            // 3. Demander le client
+            System.out.print("\nNuméro client existant (0 = nouveau client): ");
             int id = readInt();
             Client client = null;
             if (id == 0) {
@@ -295,16 +340,25 @@ public class Main {
                 if (client == null) { System.out.println("Client non trouvé."); return; }
             }
 
-            System.out.print("Numéro de chambre: ");
-            int numCh = readInt();
-            Chambre ch = hotel.rechercherChambre(numCh);
-            if (ch == null) { System.out.println("Chambre non trouvée."); return; }
-            if (ch.isOccupee()) { System.out.println("Chambre déjà occupée."); return; }
-
-            System.out.print("Date début (jj/mm/aaaa): ");
-            String debut = lireDateValide("Date début");
-            System.out.print("Date fin (jj/mm/aaaa): ");
-            String fin = lireDateValide("Date fin");
+            // 4. Demander la chambre parmi celles disponibles
+            Chambre ch = null;
+            while (ch == null) {
+                System.out.print("Numéro de chambre (0 = annuler): ");
+                int numCh = readInt();
+                if (numCh == 0) {
+                    System.out.println("Réservation annulée.");
+                    return;
+                }
+                ch = hotel.rechercherChambre(numCh);
+                if (ch == null) { 
+                    System.out.println("Chambre non trouvée. Réessayez."); 
+                    continue;
+                }
+                if (!hotel.estDisponible(ch, debut, fin)) { 
+                    System.out.println("Cette chambre n'est pas disponible pour ces dates. Réessayez."); 
+                    ch = null;
+                }
+            }
 
             Reservation r = hotel.creerReservation(client, ch, debut, fin);
             if (r == null) System.out.println("Impossible de créer la réservation.");
@@ -315,6 +369,7 @@ public class Main {
     }
 
     private static void ajouterServicesReservationInteractive() {
+        hotel.afficherToutesLesReservations();
         System.out.print("Numéro réservation: ");
         int num = readInt();
         Reservation r = hotel.rechercherReservation(num);

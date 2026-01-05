@@ -47,6 +47,29 @@ public class Hotel {
         }
         return true;
     }
+
+    public ArrayList<Chambre> getChambresDisponibles(String debut, String fin) {
+        ArrayList<Chambre> disponibles = new ArrayList<>();
+        for (Chambre ch : chambres) {
+            if (estDisponible(ch, debut, fin)) {
+                disponibles.add(ch);
+            }
+        }
+        return disponibles;
+    }
+
+    public void afficherChambresDisponiblesPourDates(String debut, String fin) {
+        ArrayList<Chambre> disponibles = getChambresDisponibles(debut, fin);
+        if (disponibles.isEmpty()) {
+            System.out.println("Aucune chambre disponible pour ces dates.");
+        } else {
+            System.out.println("Chambres disponibles du " + debut + " au " + fin + " :");
+            for (Chambre c : disponibles) {
+                System.out.println(c);
+            }
+        }
+    }
+
     public ArrayList<Chambre> rechercherChambresMultiCriteres(String type, double prixMax) {
         String t = type == null ? "" : type.toLowerCase();
         return chambres.stream()
@@ -216,6 +239,22 @@ public class Hotel {
     public void annulerReservation(int numero) {
         Reservation r = rechercherReservation(numero);
         if (r != null) r.annuler();
+    }
+
+    public boolean supprimerReservation(int numero) {
+        Reservation r = rechercherReservation(numero);
+        if (r == null) {
+            System.out.println("Réservation introuvable.");
+            return false;
+        }
+        // Libérer la chambre si la réservation était en cours ou confirmée
+        if (r.getChambre() != null && 
+            (r.getStatut().equals("Confirmée") || r.getStatut().equals("En cours"))) {
+            r.getChambre().setOccupee(false);
+        }
+        reservations.remove(r);
+        System.out.println("Réservation #" + numero + " supprimée avec succès.");
+        return true;
     }
 
     public void terminerReservation(int numero) {
