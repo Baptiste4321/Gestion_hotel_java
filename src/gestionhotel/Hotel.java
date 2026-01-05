@@ -8,6 +8,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.io.*;
+import java.io.FileWriter;
+import java.io.PrintWriter;
+import java.io.IOException;
 
 public class Hotel {
     private String nom;
@@ -393,6 +396,63 @@ public class Hotel {
             System.out.println("Données chargées avec succès !");
         } catch (Exception e) {
             System.out.println("Erreur chargement : " + e.getMessage());
+        }
+    }
+    public void genererFacture(Reservation r) {
+        if (r == null) {
+            System.out.println("Erreur : réservation invalide.");
+            return;
+        }
+
+        // Nom du fichier unique basé sur le numéro de réservation
+        String nomFichier = "facture_" + r.getNumeroReservation() + ".txt";
+
+        try (PrintWriter writer = new PrintWriter(new FileWriter(nomFichier))) {
+            // En-tête de l'hôtel
+            writer.println("=========================================");
+            writer.println("           HÔTEL JAVA FACTURE            ");
+            writer.println("          1 Rue du Code, Paris           ");
+            writer.println("=========================================");
+            writer.println();
+
+            // Informations Client
+            writer.println("CLIENT :");
+            writer.println("Nom   : " + r.getClient().getNomComplet());
+            writer.println("Email : " + r.getClient().getEmail());
+            writer.println("-----------------------------------------");
+
+            // Détails du séjour
+            writer.println("DÉTAILS DU SÉJOUR :");
+            writer.println("Réservation N° : " + r.getNumeroReservation());
+            if (r.getChambre() != null) {
+                writer.println("Chambre N°     : " + r.getChambre().getNumero() + " (" + r.getChambre().getType() + ")");
+            }
+            writer.println("Arrivée        : " + r.getDateDebut());
+            writer.println("Départ         : " + r.getDateFin());
+            writer.println("Durée          : " + r.calculerNombreNuits() + " nuit(s)");
+            writer.println("-----------------------------------------");
+
+            // Détails financiers
+            writer.println("CONSOMMATION :");
+            writer.printf("Hébergement              : %8.2f€\n", r.calculerPrixChambre());
+
+            if (!r.getServices().isEmpty()) {
+                writer.println("Services supplémentaires :");
+                for (Service s : r.getServices()) {
+                    writer.printf(" - %-20s  : %8.2f€\n", s.getNom(), s.getPrix());
+                }
+                writer.printf("Sous-total Services      : %8.2f€\n", r.calculerPrixServices());
+            }
+
+            writer.println("-----------------------------------------");
+            writer.printf("TOTAL À PAYER            : %8.2f€\n", r.calculerPrixTotal());
+            writer.println("=========================================");
+            writer.println("      Merci de votre visite !            ");
+
+            System.out.println("Facture générée avec succès : " + nomFichier);
+
+        } catch (IOException e) {
+            System.out.println("Erreur lors de la création de la facture : " + e.getMessage());
         }
     }
 }
