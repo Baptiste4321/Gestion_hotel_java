@@ -12,12 +12,6 @@ import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.io.IOException;
 
-public String getNom() {
-    return nom;
-}
-private String getNomFichier() {
-    return "hotel_" + nom.replaceAll("[^a-zA-Z0-9.-]", "_") + ".csv";
-}
 public class Hotel {
     private String nom;
     private String adresse;
@@ -25,6 +19,14 @@ public class Hotel {
     private ArrayList<Client> clients;
     private ArrayList<Reservation> reservations;
     private ArrayList<Service> servicesDisponibles;
+
+    public String getNom() {
+        return nom;
+    }
+    private String getNomFichier() {
+        // Cette méthode a besoin d'accéder à 'nom', donc elle doit être dans la classe
+        return "hotel_" + nom.replaceAll("[^a-zA-Z0-9.-]", "_") + ".csv";
+    }
 
     public Hotel(String nom, String adresse) {
         this.nom = nom;
