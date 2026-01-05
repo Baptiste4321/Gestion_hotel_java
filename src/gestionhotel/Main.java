@@ -78,7 +78,8 @@ public class Main {
             System.out.println("4) Rechercher une chambre par numéro");
             System.out.println("5) Rechercher par type");
             System.out.println("6) Rechercher par prix maximum");
-            System.out.println("7) Retour");
+            System.out.println("7) Recherche avancée");
+            System.out.println("8) Retour");
             System.out.print("Choix: ");
             int c = readInt();
             switch (c) {
@@ -222,8 +223,9 @@ public class Main {
         System.out.print("Téléphone : ");
         String tel = lireTelephoneValide();
         Client c = new Client(nom, prenom, email, tel);
-        hotel.ajouterClient(c);
-        System.out.println("Client ajouté: " + c);
+        if (hotel.ajouterClient(c)) {
+            System.out.println("Client ajouté: " + c);
+        }
     }
 
     private static void menuReservations() {

@@ -100,13 +100,14 @@ public class Hotel {
     }
 
     // Gestion des clients
-    public void ajouterClient(Client c) {
-        if (c == null) return;
+    public boolean ajouterClient(Client c) {
+        if (c == null) return false;
         if (c.getEmail() != null && rechercherClientParEmail(c.getEmail()) != null) {
             System.out.println("Un client avec cet email existe déjà: " + c.getEmail());
-            return;
+            return false;
         }
         clients.add(c);
+        return true;
     }
 
     public void afficherTousLesClients() {
