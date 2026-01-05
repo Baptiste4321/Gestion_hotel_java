@@ -106,6 +106,9 @@ public class Reservation {
         if (calculerNombreNuits() > 7) {
             total = total * 0.90;
         }
+        if (client.isVip()) {
+            total = total * 0.95; // 5% de réduction supplémentaire
+        }
         return total;
     }
 

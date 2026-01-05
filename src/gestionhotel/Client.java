@@ -12,13 +12,19 @@ public class Client {
     private String telephone;
     private int numeroClient;
 
+    private boolean vip;
+
     public Client(String nom, String prenom, String email, String telephone) {
         this.nom = nom;
         this.prenom = prenom;
         this.email = email;
         this.telephone = telephone;
         this.numeroClient = COUNTER.getAndIncrement();
+        this.vip = false;
     }
+    public boolean isVip() {return vip;}
+
+    public void setVip(boolean vip) {this.vip = vip;}
 
     public String getNom() {
         return nom;
@@ -68,7 +74,8 @@ public class Client {
 
     @Override
     public String toString() {
-        return String.format("Client #%d - %s - Email: %s - Tel: %s", numeroClient, getNomComplet(), email, telephone);
+        return String.format("Client #%d - %s - Email: %s - Tel: %s",
+                numeroClient, getNomComplet(), email, telephone, (vip ? "[VIP]" : ""));
     }
 
     public static void setCompteur(int valeur) {

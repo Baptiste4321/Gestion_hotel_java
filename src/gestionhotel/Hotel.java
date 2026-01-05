@@ -1,5 +1,7 @@
 package gestionhotel;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -22,6 +24,25 @@ public class Hotel {
         this.clients = new ArrayList<>();
         this.reservations = new ArrayList<>();
         this.servicesDisponibles = new ArrayList<>();
+    }
+    public boolean estDisponible(Chambre ch, String debut, String fin) {
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("d/M/yyyy");
+        LocalDate newDeb = LocalDate.parse(debut, dtf);
+        LocalDate newFin = LocalDate.parse(fin, dtf);
+
+        for (Reservation r : reservations) {
+            if (r.getChambre().getNumero() == ch.getNumero() &&
+                    (r.getStatut().equals("Confirmée") || r.getStatut().equals("En cours"))) {
+
+                LocalDate rDeb = LocalDate.parse(r.getDateDebut(), dtf);
+                LocalDate rFin = LocalDate.parse(r.getDateFin(), dtf);
+
+                if (newDeb.isBefore(rFin) && newFin.isAfter(rDeb)) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
     public ArrayList<Chambre> rechercherChambresMultiCriteres(String type, double prixMax) {
         String t = type == null ? "" : type.toLowerCase();
@@ -133,7 +154,10 @@ public class Hotel {
     // Gestion des réservations
     public Reservation creerReservation(Client c, Chambre ch, String debut, String fin) {
         if (c == null || ch == null) return null;
-        if (ch.isOccupee()) return null; // simple check
+        if (!estDisponible(ch, debut, fin)) {
+            System.out.println("La chambre n'est pas disponible à ces dates.");
+            return null;
+        }
         Reservation r = new Reservation(c, ch, debut, fin);
         reservations.add(r);
         return r;
