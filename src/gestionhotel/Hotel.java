@@ -12,6 +12,7 @@ import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.io.IOException;
 
+// classe principale de l'hotel avec toute la gestion
 public class Hotel {
     private String nom;
     private String adresse;
@@ -24,7 +25,6 @@ public class Hotel {
         return nom;
     }
     private String getNomFichier() {
-        // Cette méthode a besoin d'accéder à 'nom', donc elle doit être dans la classe
         return "hotel_" + nom.replaceAll("[^a-zA-Z0-9.-]", "_") + ".csv";
     }
 
@@ -36,6 +36,7 @@ public class Hotel {
         this.reservations = new ArrayList<>();
         this.servicesDisponibles = new ArrayList<>();
     }
+    // verifie si une chambre est dispo entre 2 dates
     public boolean estDisponible(Chambre ch, String debut, String fin) {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("d/M/yyyy");
         LocalDate newDeb = LocalDate.parse(debut, dtf);
@@ -56,6 +57,7 @@ public class Hotel {
         return true;
     }
 
+    // retourne les chambres libres pour une periode
     public ArrayList<Chambre> getChambresDisponibles(String debut, String fin) {
         ArrayList<Chambre> disponibles = new ArrayList<>();
         for (Chambre ch : chambres) {
@@ -66,6 +68,7 @@ public class Hotel {
         return disponibles;
     }
 
+    // affiche les chambres dispo pour des dates données
     public void afficherChambresDisponiblesPourDates(String debut, String fin) {
         ArrayList<Chambre> disponibles = getChambresDisponibles(debut, fin);
         if (disponibles.isEmpty()) {
@@ -78,6 +81,7 @@ public class Hotel {
         }
     }
 
+    // recherche avec plusieur criteres en meme temps
     public ArrayList<Chambre> rechercherChambresMultiCriteres(String type, double prixMax) {
         String t = type == null ? "" : type.toLowerCase();
         return chambres.stream()
@@ -87,7 +91,7 @@ public class Hotel {
                 .collect(Collectors.toCollection(ArrayList::new));
     }
 
-    // Gestion des chambres
+    // ajout d'une chambre (verifie qu'elle existe pas deja)
     public void ajouterChambre(Chambre c) {
         if (c == null) return;
         if (rechercherChambre(c.getNumero()) != null) {
@@ -97,6 +101,7 @@ public class Hotel {
         chambres.add(c);
     }
 
+    // affiche toute les chambres de l'hotel
     public void afficherToutesLesChambres() {
         if (chambres.isEmpty()) {
             System.out.println("Aucune chambre disponible.");
@@ -105,6 +110,7 @@ public class Hotel {
         for (Chambre c : chambres) System.out.println(c);
     }
 
+    // montre que les chambres pas occupées
     public void afficherChambresDisponibles() {
         boolean any = false;
         for (Chambre c : chambres) {
@@ -116,21 +122,24 @@ public class Hotel {
         if (!any) System.out.println("Aucune chambre disponible actuellement.");
     }
 
+    // cherche une chambre par son numero
     public Chambre rechercherChambre(int numero) {
         for (Chambre c : chambres) if (c.getNumero() == numero) return c;
         return null;
     }
 
+    // filtre les chambres par type (simple, double, suite)
     public ArrayList<Chambre> rechercherChambresParType(String type) {
         String t = type == null ? "" : type.toLowerCase();
         return chambres.stream().filter(c -> c.getType().toLowerCase().contains(t)).collect(Collectors.toCollection(ArrayList::new));
     }
 
+    // trouve les chambres sous un certain prix
     public ArrayList<Chambre> rechercherChambresParPrix(double prixMax) {
         return chambres.stream().filter(c -> c.getPrixParNuit() <= prixMax).collect(Collectors.toCollection(ArrayList::new));
     }
 
-    // Gestion des clients
+    // ajoute un client (verifie l'email en double)
     public boolean ajouterClient(Client c) {
         if (c == null) return false;
         if (c.getEmail() != null && rechercherClientParEmail(c.getEmail()) != null) {
@@ -141,6 +150,7 @@ public class Hotel {
         return true;
     }
 
+    // liste tout les clients avec leur nb de reservations
     public void afficherTousLesClients() {
         if (clients.isEmpty()) {
             System.out.println("Aucun client enregistré.");
@@ -152,28 +162,31 @@ public class Hotel {
         }
     }
 
+    // cherche un client par son numero
     public Client rechercherClient(int numero) {
         for (Client cl : clients) if (cl.getNumeroClient() == numero) return cl;
         return null;
     }
 
+    // cherche un client par email
     public Client rechercherClientParEmail(String email) {
         if (email == null) return null;
         for (Client cl : clients) if (email.equalsIgnoreCase(cl.getEmail())) return cl;
         return null;
     }
 
-    // Nouvelle méthode utilitaire
+    // recupere le dernier client ajouté
     public Client getDernierClient() {
         if (clients.isEmpty()) return null;
         return clients.get(clients.size() - 1);
     }
 
-    // Gestion des services
+    // ajoute un service au catalogue
     public void ajouterServiceDisponible(Service s) {
         if (s != null) servicesDisponibles.add(s);
     }
 
+    // affiche tout les services dispo
     public void afficherServicesDisponibles() {
         if (servicesDisponibles.isEmpty()) {
             System.out.println("Aucun service disponible.");
@@ -184,12 +197,13 @@ public class Hotel {
         }
     }
 
+    // recupere un service par son index dans la liste
     public Service getServiceParIndex(int index) {
         if (index < 0 || index >= servicesDisponibles.size()) return null;
         return servicesDisponibles.get(index);
     }
 
-    // Gestion des réservations
+    // crée une nouvelle reservation
     public Reservation creerReservation(Client c, Chambre ch, String debut, String fin) {
         if (c == null || ch == null) return null;
         if (!estDisponible(ch, debut, fin)) {
@@ -208,6 +222,7 @@ public class Hotel {
         return r;
     }
 
+    // compte le nombre de resa d'un client
     public int compterReservationsClient(Client c) {
         if (c == null) return 0;
         int count = 0;
@@ -219,6 +234,7 @@ public class Hotel {
         return count;
     }
 
+    // affiche toute les reservations
     public void afficherToutesLesReservations() {
         if (reservations.isEmpty()) {
             System.out.println("Aucune réservation.");
@@ -227,6 +243,7 @@ public class Hotel {
         for (Reservation r : reservations) System.out.println(r);
     }
 
+    // affiche les reservations d'un client spécifique
     public void afficherReservationsClient(Client c) {
         if (c == null) return;
         boolean any = false;
@@ -239,16 +256,19 @@ public class Hotel {
         if (!any) System.out.println("Aucune réservation pour ce client.");
     }
 
+    // trouve une resa par son numero
     public Reservation rechercherReservation(int numero) {
         for (Reservation r : reservations) if (r.getNumeroReservation() == numero) return r;
         return null;
     }
 
+    // annule une reservation
     public void annulerReservation(int numero) {
         Reservation r = rechercherReservation(numero);
         if (r != null) r.annuler();
     }
 
+    // supprime une resa et libere la chambre
     public boolean supprimerReservation(int numero) {
         Reservation r = rechercherReservation(numero);
         if (r == null) {
@@ -265,6 +285,7 @@ public class Hotel {
         return true;
     }
 
+    // termine une resa et genere la facture
     public void terminerReservation(int numero) {
         Reservation r = rechercherReservation(numero);
         if (r != null) {
@@ -277,17 +298,19 @@ public class Hotel {
         }
     }
 
-    // Statistiques
+    // calcule le CA total (sans les annulées)
     public double calculerChiffreAffaires() {
         return reservations.stream().filter(r -> !"Annulée".equalsIgnoreCase(r.getStatut())).mapToDouble(Reservation::calculerPrixTotal).sum();
     }
 
+    // calcul le pourcentage de chambres occupées
     public double calculerTauxOccupation() {
         if (chambres.isEmpty()) return 0.0;
         long occ = chambres.stream().filter(Chambre::isOccupee).count();
         return (occ * 100.0) / chambres.size();
     }
 
+    // affiche les stats de l'hotel (CA, taux, etc)
     public void afficherStatistiques() {
         double ca = calculerChiffreAffaires();
         System.out.printf("Chiffre d'affaires: %.2f %s\n", ca, (ca <= 1 ? "euro" : "euros"));
@@ -297,6 +320,7 @@ public class Hotel {
         else System.out.println("Pas assez de données pour déterminer la chambre la plus réservée.");
     }
 
+    // trouve la chambre la plus populaire
     public Chambre getChambrePlusReservee() {
         if (reservations.isEmpty()) return null;
         Map<Integer, Integer> counts = new HashMap<>();
@@ -309,20 +333,18 @@ public class Hotel {
         int bestNum = counts.entrySet().stream().max(Comparator.comparingInt(Map.Entry::getValue)).get().getKey();
         return rechercherChambre(bestNum);
     }
+    // sauvegarde tout dans un fichier csv
     public void sauvegarderDonnees() {
         String fichier = getNomFichier();
         try (PrintWriter writer = new PrintWriter(new FileWriter(fichier))) {
-            // save hotel info
             writer.println("---HOTEL---");
             writer.printf("%s;%s\n", nom, adresse);
             
-            // save clients
             writer.println("---CLIENTS---");
             for (Client c : clients) {
                 writer.printf("%d;%s;%s;%s;%s;%b\n", c.getNumeroClient(), c.getNom(), c.getPrenom(), c.getEmail(), c.getTelephone(), c.isVip());
             }
 
-            // save chambres
             writer.println("---CHAMBRES---");
             for (Chambre c : chambres) {
                 String type = "SIMPLE";
@@ -337,13 +359,11 @@ public class Hotel {
 
                 writer.printf("%s;%d;%.2f;%b;%s\n", type, c.getNumero(), c.getPrixParNuit(), c.isOccupee(), extra);
             }
-            // save services catalog
             writer.println("---SERVICES_CATALOG---");
             for (Service s : servicesDisponibles) {
                 writer.printf("%s;%.2f;%s\n", s.getNom(), s.getPrix(), s.getDescription());
             }
 
-            // save reservations
             writer.println("---RESERVATIONS---");
             for (Reservation r : reservations) {
 
@@ -355,11 +375,9 @@ public class Hotel {
                         r.getDateFin(),
                         r.getStatut());
             }
-            //save services des réservations
             writer.println("---RESERVATION_SERVICES---");
             for (Reservation r : reservations) {
                 for (Service s : r.getServices()) {
-                    // Format: ID_Reservation;Nom_Service;Prix;Description
                     writer.printf("%d;%s;%.2f;%s\n", r.getNumeroReservation(), s.getNom(), s.getPrix(), s.getDescription());
                 }
             }
@@ -370,6 +388,7 @@ public class Hotel {
         }
     }
 
+    // charge les données depuis le csv
     public void chargerDonnees() {
         File fichier = new File(getNomFichier());
         if (!fichier.exists()) return;
@@ -391,12 +410,10 @@ public class Hotel {
 
                 String[] parts = ligne.split(";");
 
-                // charge hotel info
                 if (section.equals("---HOTEL---") && parts.length >= 2) {
                     this.nom = parts[0];
                     this.adresse = parts[1];
                 }
-                // charge clients
                 else if (section.equals("---CLIENTS---") && parts.length >= 5) {
                     Client c = new Client(parts[1], parts[2], parts[3], parts[4]);
                     if (parts.length >= 6) {
@@ -406,10 +423,9 @@ public class Hotel {
                     try {
                         int idLuu = Integer.parseInt(parts[0]);
                         if (idLuu > maxIdClient) maxIdClient = idLuu;
-                    } catch(NumberFormatException e) { /* ignoré */ }
+                    } catch(NumberFormatException e) { }
                     clients.add(c);
                 }
-                // charge chambres
                 else if (section.equals("---CHAMBRES---") && parts.length >= 4) {
                     String type = parts[0];
                     int num = Integer.parseInt(parts[1]);
@@ -432,17 +448,15 @@ public class Hotel {
                         chambres.add(c);
                     }
                 }
-                // charge services catalog
                 else if (section.equals("---SERVICES_CATALOG---") && parts.length >= 3) {
                     try {
                         String nom = parts[0];
                         double prix = Double.parseDouble(parts[1]);
                         String desc = parts[2];
                         servicesDisponibles.add(new Service(nom, prix, desc));
-                    } catch (Exception e) { /* Ignorer ligne corrompue */ }
+                    } catch (Exception e) { }
                 }
 
-                // charge reservations
                 else if (section.equals("---RESERVATIONS---") && parts.length >= 6) {
                     int idClient = Integer.parseInt(parts[1]);
                     int numChambre = Integer.parseInt(parts[2]);
@@ -465,17 +479,15 @@ public class Hotel {
                     }
                 }
 
-                // charge services des réservations
                 else if (section.equals("---RESERVATION_SERVICES---") && parts.length >= 4) {
                     try {
                         int idRes = Integer.parseInt(parts[0]);
                         Reservation r = rechercherReservation(idRes);
                         if (r != null) {
-                            // On recrée l'objet service pour la réservation
                             Service s = new Service(parts[1], Double.parseDouble(parts[2]), parts[3]);
                             r.ajouterService(s);
                         }
-                    } catch (Exception e) { /* Ignorer */ }
+                    } catch (Exception e) { }
                 }
             }
 
@@ -488,6 +500,7 @@ public class Hotel {
             System.out.println("Erreur chargement : " + e.getMessage());
         }
     }
+    // genere une facture en fichier txt
     public void genererFacture(Reservation r) {
         if (r == null) {
             System.out.println("Erreur : réservation invalide.");
@@ -559,13 +572,10 @@ public class Hotel {
         }
     }
 
-    // ===== GESTION MULTI-HOTELS =====
-    
+    // fichier qui contient la liste de tout les hotels
     private static final String FICHIER_HOTELS = "hotels_liste.csv";
     
-    /**
-     * Sauvegarde la liste de tous les hôtels dans un fichier central
-     */
+    // sauvegarde la liste des hotels dans le fichier central
     public static void sauvegarderListeHotels(ArrayList<Hotel> hotels) {
         try (PrintWriter writer = new PrintWriter(new FileWriter(FICHIER_HOTELS))) {
             for (Hotel h : hotels) {
@@ -577,9 +587,7 @@ public class Hotel {
         }
     }
     
-    /**
-     * Charge la liste de tous les hôtels depuis le fichier central
-     */
+    // charge tout les hotels depuis le fichier
     public static ArrayList<Hotel> chargerListeHotels() {
         ArrayList<Hotel> hotels = new ArrayList<>();
         File fichier = new File(FICHIER_HOTELS);
@@ -606,9 +614,7 @@ public class Hotel {
         return hotels;
     }
     
-    /**
-     * Sauvegarde tous les hôtels (leurs données + la liste)
-     */
+    // sauvegarde tout les hotels d'un coup
     public static void sauvegarderTousLesHotels(ArrayList<Hotel> hotels) {
         for (Hotel h : hotels) {
             h.sauvegarderDonnees();

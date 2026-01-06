@@ -3,6 +3,7 @@ package gestionhotel;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 
+// represente un client de l'hotel
 public class Client {
     private static final AtomicInteger COUNTER = new AtomicInteger(1);
 
@@ -14,6 +15,7 @@ public class Client {
 
     private boolean vip;
 
+    // cree un nouveau client avec les infos de base
     public Client(String nom, String prenom, String email, String telephone) {
         this.nom = nom;
         this.prenom = prenom;
@@ -22,6 +24,7 @@ public class Client {
         this.numeroClient = COUNTER.getAndIncrement();
         this.vip = false;
     }
+    // verifie si le client est vip
     public boolean isVip() {return vip;}
 
     public void setVip(boolean vip) {this.vip = vip;}
@@ -62,10 +65,12 @@ public class Client {
         return numeroClient;
     }
 
+    // retourne le nom complet (prenom + nom)
     public String getNomComplet() {
         return String.format("%s %s", prenom, nom).trim();
     }
 
+    // verifie que l'email est valide avec une regex
     public boolean validerEmail() {
         if (email == null) return false;
         String regex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
@@ -78,6 +83,7 @@ public class Client {
                 numeroClient, getNomComplet(), email, telephone);
     }
 
+    // remet le compteur d'id a une valeur (pour le chargement)
     public static void setCompteur(int valeur) {
         COUNTER.set(valeur);
     }

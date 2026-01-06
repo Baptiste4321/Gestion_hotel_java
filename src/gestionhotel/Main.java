@@ -7,16 +7,16 @@ import java.time.format.DateTimeParseException;
 import java.time.LocalDate;
 import java.io.File;
 
+// classe principale avec le menu console
 public class Main {
     private static final Scanner scanner = new Scanner(System.in);
 
-    // Liste pour gérer plusieurs hôtels
+    // tout les hotels de la chaine
     private static ArrayList<Hotel> chaineHotels = new ArrayList<>();
-    // L'hôtel sur lequel on travaille actuellement
+    // l'hotel selectionné actuellement
     private static Hotel currentHotel;
 
     public static void main(String[] args) {
-        // Au démarrage, on charge la liste des hôtels existants
         chaineHotels = Hotel.chargerListeHotels();
         
         if (chaineHotels.isEmpty()) {
@@ -26,11 +26,10 @@ public class Main {
             System.out.println("Bienvenue ! " + chaineHotels.size() + " hôtel(s) chargé(s).");
         }
 
-        // Lancement du menu de sélection de l'hôtel
         menuChaine();
     }
 
-    // --- NOUVEAU MENU : Gestion de la chaîne ---
+    // menu pour choisir l'hotel ou en creer un nouveau
     private static void menuChaine() {
         while (true) {
             System.out.println("\n=== GESTION CHAÎNE HÔTELIÈRE ===");
@@ -62,6 +61,7 @@ public class Main {
         }
     }
 
+    // cree un nouvel hotel et l'ajoute a la chaine
     private static void creerNouvelHotel() {
         System.out.print("Nom du nouvel hôtel : ");
         String nom = readLine();
@@ -80,6 +80,7 @@ public class Main {
         System.out.println("Hôtel '" + nom + "' créé avec succès !");
     }
 
+    // permet de choisir un hotel existant
     private static void selectionnerHotel() {
         if (chaineHotels.isEmpty()) {
             System.out.println("Aucun hôtel dans la chaîne. Créez-en un d'abord.");
@@ -96,15 +97,14 @@ public class Main {
         if (choix > 0 && choix <= chaineHotels.size()) {
             currentHotel = chaineHotels.get(choix - 1);
 
-            // On charge les données spécifiques à cet hôtel (si le fichier existe)
             currentHotel.chargerDonnees();
 
             System.out.println("Vous gérez maintenant : " + currentHotel.getNom());
-            mainMenu(); // On entre dans le menu classique de gestion
+            mainMenu();
         }
     }
 
-    // --- MENU PRINCIPAL DE L'HÔTEL SÉLECTIONNÉ ---
+    // menu principal de l'hotel selectionné
     private static void mainMenu() {
         while (true) {
             System.out.println("\n=== Menu Hôtel : " + currentHotel.getNom() + " ===");
@@ -125,23 +125,21 @@ public class Main {
                 case 0:
                     currentHotel.sauvegarderDonnees();
                     System.out.println("Données de " + currentHotel.getNom() + " sauvegardées.");
-                    currentHotel = null; // On se déconnecte de l'hôtel
-                    return; // Retour au menuChaine()
+                    currentHotel = null;
+                    return;
                 default: System.out.println("Choix invalide.");
             }
         }
     }
 
-    // Génération de données de test pour un hôtel donné
+    // genere des donnees de base pour tester
     private static void seedData(Hotel h) {
-        // Chambres
         h.ajouterChambre(new ChambreSimple(101));
         h.ajouterChambre(new ChambreSimple(102));
         h.ajouterChambre(new ChambreDouble(201, false));
         h.ajouterChambre(new ChambreDouble(202, true));
         h.ajouterChambre(new Suite(301, true, true));
 
-        // Services
         h.ajouterServiceDisponible(new Service("Petit-déjeuner", 15.0, "Buffet"));
         h.ajouterServiceDisponible(new Service("Dîner au restaurant", 35.0, "Menu du chef"));
         h.ajouterServiceDisponible(new Service("Spa (1h)", 50.0, "Accès spa 1 heure"));
@@ -151,9 +149,7 @@ public class Main {
         System.out.println("Données de base générées pour " + h.getNom());
     }
 
-    // ---------------------------------------------------------
-    // --- GESTION DES CHAMBRES ---
-    // ---------------------------------------------------------
+    // sous-menu pour gerer les chambres
     private static void menuChambres() {
         while (true) {
             System.out.println("\n--- Gestion des chambres (" + currentHotel.getNom() + ") ---");
@@ -211,6 +207,7 @@ public class Main {
         }
     }
 
+    // ajoute une chambre en demandant les infos
     private static void ajouterChambreInteractive() {
         try {
             System.out.print("Numéro: ");
@@ -244,9 +241,7 @@ public class Main {
         }
     }
 
-    // ---------------------------------------------------------
-    // --- GESTION DES CLIENTS ---
-    // ---------------------------------------------------------
+    // sous-menu pour gerer les clients
     private static void menuClients() {
         while (true) {
             System.out.println("\n--- Gestion des clients (" + currentHotel.getNom() + ") ---");
@@ -305,6 +300,7 @@ public class Main {
         }
     }
 
+    // ajoute un client en demandant les infos
     private static void ajouterClientInteractive() {
         System.out.print("Prénom: ");
         String prenom = readLine();
@@ -321,9 +317,7 @@ public class Main {
         }
     }
 
-    // ---------------------------------------------------------
-    // --- GESTION DES RESERVATIONS ---
-    // ---------------------------------------------------------
+    // sous-menu pour gerer les reservations
     private static void menuReservations() {
         while (true) {
             System.out.println("\n--- Gestion des réservations (" + currentHotel.getNom() + ") ---");
@@ -365,7 +359,6 @@ public class Main {
                     System.out.print("Numéro réservation à terminer: ");
                     int nt = readInt();
                     currentHotel.terminerReservation(nt);
-                    // Note : terminerReservation appelle déjà genererFacture dans Hotel.java
                     break;
                 case 8:
                     System.out.print("Numéro réservation pour facture : ");
@@ -383,6 +376,7 @@ public class Main {
         }
     }
 
+    // cree une resa en demandant tout les details
     private static void creerReservationInteractive() {
         try {
             System.out.print("Numéro client existant (0 = nouveau client): ");
@@ -416,6 +410,7 @@ public class Main {
         }
     }
 
+    // ajoute des services a une resa existante
     private static void ajouterServicesReservationInteractive() {
         System.out.print("Numéro réservation: ");
         int num = readInt();
@@ -439,9 +434,7 @@ public class Main {
         System.out.println("Total services: " + totalServices + (totalServices <= 1 ? " euro" : " euros"));
     }
 
-    // ---------------------------------------------------------
-    // --- GESTION DES SERVICES ---
-    // ---------------------------------------------------------
+    // sous-menu pour gerer les services
     private static void menuServices() {
         while (true) {
             System.out.println("\n--- Gestion des services (" + currentHotel.getNom() + ") ---");
@@ -483,9 +476,7 @@ public class Main {
         }
     }
 
-    // ---------------------------------------------------------
-    // --- STATISTIQUES ---
-    // ---------------------------------------------------------
+    // affiche les statistiques de l'hotel
     private static void menuStats() {
         while (true) {
             System.out.println("\n--- Statistiques (" + currentHotel.getNom() + ") ---");
@@ -514,9 +505,7 @@ public class Main {
         }
     }
 
-    // ---------------------------------------------------------
-    // --- HELPERS (Entrées utilisateur) ---
-    // ---------------------------------------------------------
+    // lit un entier au clavier
     private static int readInt() {
         while (true) {
             try {
@@ -528,6 +517,7 @@ public class Main {
         }
     }
 
+    // lit un double au clavier
     private static double readDouble() {
         while (true) {
             try {
@@ -539,6 +529,7 @@ public class Main {
         }
     }
 
+    // lit un boolean (oui/non, true/false)
     private static boolean readBoolean() {
         while (true) {
             String s = scanner.nextLine().trim().toLowerCase();
@@ -548,10 +539,12 @@ public class Main {
         }
     }
 
+    // lit une ligne de texte
     private static String readLine() {
         return scanner.nextLine().trim();
     }
 
+    // verifie que le tel fait 10 chiffres
     private static String lireTelephoneValide() {
         while (true) {
             String tel = readLine();
@@ -562,6 +555,7 @@ public class Main {
         }
     }
 
+    // verifie le format de l'email
     private static String lireEmailValide() {
         while (true) {
             String email = readLine();
@@ -572,6 +566,7 @@ public class Main {
         }
     }
 
+    // verifie que la date est valide et pas dans le passé
     private static String lireDateValide(String message) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/M/yyyy");
         while (true) {

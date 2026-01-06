@@ -1,10 +1,12 @@
 package gestionhotel;
 
+// services supplementaire qu'on peut ajouter a une resa
 public class Service {
     private String nom;
     private double prix;
     private String description;
 
+    // cree un nouveau service avec nom prix et description
     public Service(String nom, double prix, String description) {
         this.nom = nom;
         this.prix = prix;

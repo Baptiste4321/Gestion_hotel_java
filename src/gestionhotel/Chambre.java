@@ -1,11 +1,13 @@
 package gestionhotel;
 
+// classe abstraite pour les chambres
 public abstract class Chambre {
     protected int numero;
     protected double prixParNuit;
     protected boolean occupee;
     protected int capacite;
 
+    // constructeur de base pour une chambre
     public Chambre(int numero, double prixParNuit, int capacite) {
         this.numero = numero;
         this.prixParNuit = prixParNuit;
@@ -53,6 +55,7 @@ public abstract class Chambre {
 
     public abstract String getType();
 
+    // calcul le prix total pour un nombre de nuits
     public double calculerPrix(int nbNuits) {
         return prixParNuit * nbNuits;
     }

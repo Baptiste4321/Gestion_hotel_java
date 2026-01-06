@@ -1,9 +1,11 @@
 package gestionhotel;
 
+// suite de luxe avec jacuzzi et balcon en option
 public class Suite extends Chambre {
     private boolean jacuzzi;
     private boolean balcon;
 
+    // suite de luxe avec options
     public Suite(int numero, boolean jacuzzi, boolean balcon) {
         super(numero, 150.0 + (jacuzzi ? 30.0 : 0.0) + (balcon ? 20.0 : 0.0), 4);
         this.jacuzzi = jacuzzi;
@@ -28,6 +30,7 @@ public class Suite extends Chambre {
         recomputePrix();
     }
 
+    // recalcule le prix si on change les options
     private void recomputePrix() {
         this.prixParNuit = 150.0 + (jacuzzi ? 30.0 : 0.0) + (balcon ? 20.0 : 0.0);
     }

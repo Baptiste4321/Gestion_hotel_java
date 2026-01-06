@@ -7,19 +7,21 @@ import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.time.Month;
 
+// classe pour gerer les reservations des clients
 public class Reservation {
     private static final AtomicInteger COUNTER = new AtomicInteger(1);
 
     private int numeroReservation;
     private Client client;
     private Chambre chambre;
-    private String dateDebut; // format jj/mm/aaaa
+    private String dateDebut;
     private String dateFin;
     private ArrayList<Service> services;
-    private String statut; // "En cours", "Confirmée", "Annulée", "Terminée"
+    private String statut;
 
     private static final DateTimeFormatter FORMAT = DateTimeFormatter.ofPattern("d/M/yyyy");
 
+    // cree une nouvelle resa et met la chambre en occupé
     public Reservation(Client client, Chambre chambre, String dateDebut, String dateFin) {
         this.numeroReservation = COUNTER.getAndIncrement();
         this.client = client;
@@ -81,6 +83,7 @@ public class Reservation {
         this.statut = statut;
     }
 
+    // calcule le nb de nuits entre les 2 dates
     public int calculerNombreNuits() {
         try {
             LocalDate debut = LocalDate.parse(dateDebut, FORMAT);
@@ -92,50 +95,59 @@ public class Reservation {
         }
     }
 
+    // prix de la chambre sans les services
     public double calculerPrixChambre() {
         int nuits = calculerNombreNuits();
         if (chambre == null) return 0.0;
         return chambre.calculerPrix(nuits);
     }
 
+    // total des services commandés
     public double calculerPrixServices() {
         return services.stream().mapToDouble(Service::getPrix).sum();
     }
 
+    // calcul du prix avec les reductions
     public double calculerPrixTotal() {
         double total = calculerPrixChambre() + calculerPrixServices();
 
+        // reduc basse saison 20%
         if (estEnBasseSaison()) {
-            total = total * 0.80; // Applique 20% de réduction
+            total = total * 0.80;
         }
+        // plus de 7 nuits = 10% de reduc
         if (calculerNombreNuits() > 7) {
-            total = total * 0.90; // Réduction long séjour
+            total = total * 0.90;
         }
+        // les vip ont 5% en plus
         if (client.isVip()) {
-            total = total * 0.95; // Réduction VIP
+            total = total * 0.95;
         }
         return total;
     }
+    // on a mis janvier fevrier et novembre en basse saison
     public boolean estEnBasseSaison() {
         try {
             LocalDate debut = LocalDate.parse(dateDebut, FORMAT);
             Month mois = debut.getMonth();
-            // On décide que Janvier, Février et Novembre sont en promo mais c'est juste comme ca
             return mois == Month.JANUARY || mois == Month.FEBRUARY || mois == Month.NOVEMBER;
         } catch (Exception e) {
             return false;
         }
     }
 
+    // ajoute un service a la resa
     public void ajouterService(Service s) {
         if (s != null) services.add(s);
     }
 
+    // annule la resa et libere la chambre
     public void annuler() {
         this.statut = "Annulée";
         if (this.chambre != null) this.chambre.setOccupee(false);
     }
 
+    // termine la resa (checkout)
     public void terminer() {
         this.statut = "Terminée";
         if (this.chambre != null) this.chambre.setOccupee(false);
